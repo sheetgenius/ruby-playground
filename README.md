@@ -3,6 +3,8 @@
 A friendly place for kids to write real Ruby and watch it run, right in the browser.
 Code goes on the left, and the result shows up on a little screen on the right. There's nothing to install.
 
+**Try it:** <https://sheetgenius.github.io/ruby-playground/>
+
 ![Ruby Playground running a program that asks for your name](docs/playground.jpg)
 
 It runs the real Ruby interpreter (Ruby 4.0.0, compiled to WebAssembly by the
