@@ -1,0 +1,1457 @@
+<title>Ruby Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@400;600&family=Fredoka:wght@500;600&display=swap">
+<style>
+  :root {
+    /* Layout: a two-pane workbench. The code sits on a white sheet at left; a small dark computer screen at right shows what it does. */
+    --bg: #ECF3EF;
+    --panel: #FFFFFF;
+    --edge: #CCDCD5;
+    --ink: #1C2629;
+    --muted: #56676B;
+    --chip: #DFEAE5;
+    --chip-hover: #D2E2DB;
+    --gutter-bg: #F3F8F5;
+    --gutter: #92A8A2;
+    --ruby: #C81E45;
+    --ruby-deep: #8F1230;
+    --on-ruby: #FFFFFF;
+    --stop: #2E3B40;
+    --stop-deep: #141C1F;
+    --focus: #2A7DE1;
+    --select: rgba(42, 125, 225, 0.22);
+    --bad-line: rgba(200, 30, 69, 0.12);
+
+    --s-key: #B0245C;
+    --s-str: #1F7A45;
+    --s-num: #6B3FC6;
+    --s-com: #78898D;
+    --s-call: #1C60B5;
+    --s-meth: #0B7680;
+    --s-const: #9C5400;
+    --s-ivar: #8546AE;
+
+    --screen: #141B21;
+    --screen-edge: #263139;
+    --screen-ink: #E3EEE9;
+    --screen-dim: #8DA0A5;
+    --answer: #FFCC57;
+    --oops: #FF9EB1;
+    --oops-bg: #2B1C23;
+    --oops-edge: #6E3346;
+    --note-bg: #2A2617;
+    --note-edge: #5F5226;
+    --good: #63D79A;
+    --busy: #74B4FF;
+
+    --gem-1: #F2557A;
+    --gem-2: #C81E45;
+    --gem-3: #8F1230;
+    --gem-4: #E23A60;
+
+    --display: "Fredoka", "Trebuchet MS", "Avenir Next", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --code-size: 18px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1619;
+      --panel: #172125;
+      --edge: #2A383D;
+      --ink: #E3ECE8;
+      --muted: #93A4A8;
+      --chip: #213035;
+      --chip-hover: #2A3B41;
+      --gutter-bg: #131C20;
+      --gutter: #5F7479;
+      --ruby: #EA3F65;
+      --ruby-deep: #9E1E3D;
+      --stop: #3C4C52;
+      --stop-deep: #1C2629;
+      --focus: #6AA8FF;
+      --select: rgba(106, 168, 255, 0.28);
+      --bad-line: rgba(234, 63, 101, 0.18);
+      --s-key: #FF7AA2;
+      --s-str: #7BD88F;
+      --s-num: #B79CFF;
+      --s-com: #7F9297;
+      --s-call: #74B4FF;
+      --s-meth: #5FD4DC;
+      --s-const: #FFB866;
+      --s-ivar: #D6A2FF;
+      --screen: #0A0F12;
+      --screen-edge: #24313A;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0F1619;
+    --panel: #172125;
+    --edge: #2A383D;
+    --ink: #E3ECE8;
+    --muted: #93A4A8;
+    --chip: #213035;
+    --chip-hover: #2A3B41;
+    --gutter-bg: #131C20;
+    --gutter: #5F7479;
+    --ruby: #EA3F65;
+    --ruby-deep: #9E1E3D;
+    --stop: #3C4C52;
+    --stop-deep: #1C2629;
+    --focus: #6AA8FF;
+    --select: rgba(106, 168, 255, 0.28);
+    --bad-line: rgba(234, 63, 101, 0.18);
+    --s-key: #FF7AA2;
+    --s-str: #7BD88F;
+    --s-num: #B79CFF;
+    --s-com: #7F9297;
+    --s-call: #74B4FF;
+    --s-meth: #5FD4DC;
+    --s-const: #FFB866;
+    --s-ivar: #D6A2FF;
+    --screen: #0A0F12;
+    --screen-edge: #24313A;
+    color-scheme: dark;
+  }
+
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 var(--body);
+    padding-inline: 16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .app {
+    height: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-block: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Header */
+  .top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .gem { width: 46px; height: 46px; flex: none; }
+  .gem .f1 { fill: var(--gem-1); }
+  .gem .f2 { fill: var(--gem-2); }
+  .gem .f3 { fill: var(--gem-3); }
+  .gem .f4 { fill: var(--gem-4); }
+  .brand h1 {
+    margin: 0;
+    font: 600 30px/1.1 var(--display);
+    letter-spacing: 0.2px;
+    text-wrap: balance;
+  }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+
+  /* Example programs */
+  .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .examples-label { font: 500 15px var(--display); color: var(--muted); margin-right: 2px; }
+  .example {
+    font: 500 15px/1.2 var(--display);
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: var(--chip);
+    cursor: pointer;
+  }
+  .example:hover { background: var(--chip-hover); }
+  .example[aria-pressed="true"] { border-color: var(--ruby); background: var(--panel); }
+
+  /* Workbench */
+  .bench {
+    flex: 1;
+    min-height: 440px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 16px;
+  }
+  .pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    border: 2px solid var(--edge);
+    border-radius: 20px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .code-pane:focus-within { border-color: var(--focus); }
+  .pane-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px 10px 18px;
+    border-bottom: 2px solid var(--edge);
+    min-height: 64px;
+  }
+  .file-name { font: 600 15px var(--mono); color: var(--muted); }
+
+  .run {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font: 600 20px/1 var(--display);
+    color: var(--on-ruby);
+    background: var(--ruby);
+    border: 0;
+    border-radius: 999px;
+    padding: 11px 20px 11px 18px;
+    box-shadow: 0 4px 0 var(--ruby-deep);
+    cursor: pointer;
+    transition: transform 80ms ease, box-shadow 80ms ease;
+  }
+  .run:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ruby-deep); }
+  .run[data-mode="stop"] { background: var(--stop); box-shadow: 0 4px 0 var(--stop-deep); }
+  .run[data-mode="stop"]:active { box-shadow: 0 1px 0 var(--stop-deep); }
+  .run:disabled { cursor: progress; }
+  .run svg { width: 15px; height: 15px; fill: currentColor; }
+  .run .keys {
+    font: 600 12px/1 var(--body);
+    opacity: 0.85;
+    padding-left: 9px;
+    border-left: 1px solid rgba(255, 255, 255, 0.45);
+  }
+  .run.nudge { animation: nudge 700ms ease 2; }
+  @keyframes nudge {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px) scale(1.04); }
+    60% { transform: translateY(1px); }
+  }
+
+  /* Code editor: a transparent textarea laid exactly over a painted copy of the same text */
+  .editor {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background: linear-gradient(to right, var(--gutter-bg) 0 46px, transparent 46px) local;
+  }
+  .editor-grid { display: grid; min-height: 100%; }
+  .paint, .code {
+    grid-area: 1 / 1;
+    margin: 0;
+    border: 0;
+    width: 100%;
+    padding: 16px 18px 48px 60px;
+    font-family: var(--mono);
+    font-size: var(--code-size);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0;
+    font-variant-ligatures: none;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    tab-size: 2;
+  }
+  .paint { color: var(--ink); pointer-events: none; counter-reset: line; }
+  .code {
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    caret-color: var(--ruby);
+    outline: none;
+  }
+  .code::selection { background: var(--select); }
+  .ln { position: relative; counter-increment: line; }
+  .ln::before {
+    content: counter(line);
+    position: absolute;
+    top: 0;
+    right: calc(100% + 16px);
+    font-size: 0.78em;
+    line-height: calc(var(--code-size) * 1.6);
+    color: var(--gutter);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+  .ln.bad { background: var(--bad-line); border-radius: 4px; }
+  .ln.bad::before { color: var(--ruby); font-weight: 600; }
+  .t-key { color: var(--s-key); }
+  .t-str { color: var(--s-str); }
+  .t-num { color: var(--s-num); }
+  .t-com { color: var(--s-com); font-style: italic; }
+  .t-call { color: var(--s-call); }
+  .t-meth { color: var(--s-meth); }
+  .t-const { color: var(--s-const); }
+  .t-ivar { color: var(--s-ivar); }
+  .t-interp { color: var(--s-key); }
+
+  /* Ruby words */
+  .words {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 14px 12px;
+    border-top: 2px solid var(--edge);
+  }
+  .words-label { font: 500 14px var(--display); color: var(--muted); margin-right: 2px; }
+  .word {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    border: 0;
+    border-radius: 10px;
+    padding: 6px 10px;
+    background: var(--chip);
+    cursor: pointer;
+  }
+  .word:hover { background: var(--chip-hover); }
+  .word code { font: 600 15px var(--mono); color: var(--s-call); }
+  .word span { font-size: 13px; color: var(--muted); }
+
+  /* Screen */
+  .screen-pane { background: var(--screen); border-color: var(--screen-edge); }
+  .screen-pane .pane-head { border-bottom-color: var(--screen-edge); }
+  .screen-title { font: 600 17px var(--display); color: var(--screen-ink); }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--screen-dim);
+    padding: 4px 11px 4px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--screen-edge);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--screen-dim); }
+  .status[data-state="ready"]::before { background: var(--good); }
+  .status[data-state="running"]::before { background: var(--busy); animation: blink 1s ease-in-out infinite; }
+  .status[data-state="waiting"]::before { background: var(--answer); }
+  .status[data-state="waiting"] { color: var(--answer); border-color: var(--note-edge); }
+  .status[data-state="loading"]::before { background: var(--answer); animation: blink 1s ease-in-out infinite; }
+  .status[data-state="problem"]::before { background: var(--oops); }
+  @keyframes blink { 50% { opacity: 0.3; } }
+  .clear {
+    margin-left: auto;
+    background: transparent;
+    color: var(--screen-dim);
+    border: 1.5px solid var(--screen-edge);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .clear:hover { color: var(--screen-ink); }
+
+  .screen {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 18px 20px 28px;
+    color: var(--screen-ink);
+    font: var(--code-size)/1.55 var(--mono);
+  }
+  .out { margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .out .err { color: var(--screen-dim); }
+  .out .typed { color: var(--answer); }
+  .ask {
+    font: inherit;
+    color: var(--answer);
+    caret-color: var(--answer);
+    background: rgba(255, 204, 87, 0.08);
+    border: 0;
+    border-bottom: 2px solid var(--answer);
+    border-radius: 4px 4px 0 0;
+    padding: 0 4px;
+    margin: 0;
+    max-width: 100%;
+    outline: none;
+  }
+  .ask::placeholder { color: var(--screen-dim); opacity: 1; }
+  .ask:focus-visible { background: rgba(255, 204, 87, 0.16); }
+
+  .placeholder { display: grid; gap: 6px; font: 16px/1.5 var(--body); color: var(--screen-dim); }
+  .placeholder strong { font: 600 19px var(--display); color: var(--screen-ink); }
+  .placeholder .wait-note { margin-top: 8px; max-width: 46ch; color: var(--answer); }
+  .placeholder kbd, .note kbd {
+    font: 600 13px var(--body);
+    border: 1px solid var(--screen-edge);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 1px 6px;
+    color: var(--screen-ink);
+  }
+
+  .end-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    font: 13px var(--body);
+    color: var(--screen-dim);
+  }
+  .end-mark::before, .end-mark::after { content: ""; flex: 1; border-top: 1px dashed var(--screen-edge); }
+
+  .oops, .note {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 2px solid var(--oops-edge);
+    background: var(--oops-bg);
+    font: 16px/1.5 var(--body);
+    color: var(--screen-ink);
+  }
+  .note { border-color: var(--note-edge); background: var(--note-bg); }
+  .oops-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .oops-title { margin: 0; font: 600 19px/1.3 var(--display); color: var(--oops); text-wrap: balance; }
+  .note .oops-title { color: var(--answer); }
+  .line-badge {
+    font: 600 13px var(--mono);
+    color: var(--screen-ink);
+    background: var(--oops-edge);
+    padding: 2px 9px;
+    border-radius: 999px;
+    border: 0;
+    cursor: pointer;
+  }
+  .oops p, .note p { margin: 0; }
+  .oops code, .note code {
+    font: 600 0.95em var(--mono);
+    color: var(--answer);
+    background: rgba(255, 255, 255, 0.07);
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+  .oops details { margin-top: 2px; }
+  .oops summary { cursor: pointer; color: var(--screen-dim); font-size: 14px; }
+  .oops details pre {
+    margin: 6px 0 0;
+    font: 13px/1.5 var(--mono);
+    color: var(--screen-dim);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: calc(100% - 32px);
+    padding: 10px 10px 10px 16px;
+    border-radius: 14px;
+    background: var(--ink);
+    color: var(--bg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 5;
+  }
+  .toast button {
+    flex: none;
+    border: 1.5px solid currentColor;
+    background: transparent;
+    color: inherit;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font: 600 14px var(--body);
+    cursor: pointer;
+  }
+
+  @media (max-width: 820px) {
+    .app { height: auto; }
+    .bench { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    .editor { flex: none; height: 46vh; min-height: 260px; }
+    .screen { flex: none; min-height: 280px; max-height: 70vh; }
+    .brand h1 { font-size: 26px; }
+    :root { --code-size: 16px; }
+    .run .keys { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .run, .run.nudge, .status::before { transition: none; animation: none !important; }
+  }
+</style>
+
+<div class="app">
+  <header class="top">
+    <svg class="gem" viewBox="0 0 48 48" aria-hidden="true">
+      <polygon class="f2" points="12,6 36,6 46,18 24,44 2,18"></polygon>
+      <polygon class="f1" points="12,6 36,6 30,18 18,18"></polygon>
+      <polygon class="f4" points="12,6 18,18 2,18"></polygon>
+      <polygon class="f3" points="36,6 46,18 30,18"></polygon>
+      <polygon class="f3" points="30,18 46,18 24,44"></polygon>
+      <polygon class="f4" points="2,18 18,18 24,44"></polygon>
+    </svg>
+    <div class="brand">
+      <h1>Ruby Playground</h1>
+      <p>Write Ruby on the left. Press Run. Your program shows up on the screen.</p>
+    </div>
+  </header>
+
+  <nav class="examples" id="examples" aria-label="Example programs">
+    <span class="examples-label">Try one:</span>
+  </nav>
+
+  <main class="bench">
+    <section class="pane code-pane" aria-label="Your code">
+      <div class="pane-head">
+        <span class="file-name">my_code.rb</span>
+        <button class="run" id="run" type="button" data-mode="run">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path id="run-icon" d="M3 1.5v13l11-6.5z"></path></svg>
+          <span id="run-label">Run</span>
+          <span class="keys" id="run-keys">Ctrl Enter</span>
+        </button>
+      </div>
+      <div class="editor" id="editor">
+        <div class="editor-grid">
+          <pre class="paint" id="paint" aria-hidden="true"></pre>
+          <textarea class="code" id="code" aria-label="Your Ruby code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="soft"></textarea>
+        </div>
+      </div>
+      <div class="words" id="words">
+        <span class="words-label">Add a Ruby word:</span>
+      </div>
+    </section>
+
+    <section class="pane screen-pane" aria-label="Screen">
+      <div class="pane-head">
+        <span class="screen-title">Screen</span>
+        <span class="status" id="status" data-state="loading" role="status">Waking up Ruby…</span>
+        <button class="clear" id="clear" type="button">Clear</button>
+      </div>
+      <div class="screen" id="screen" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" hidden>
+    <span id="toast-text"></span>
+    <button type="button" id="toast-undo">Bring back my code</button>
+  </div>
+</div>
+
+<script type="text/x-ruby" class="ruby-example" data-id="hello" data-name="Hello">
+# Welcome to Ruby!
+# Change the words inside the quotes, then press Run.
+
+puts "Hello! I am a computer."
+puts "I can do math: 7 + 5 = #{7 + 5}"
+
+3.times do
+  puts "Ruby is fun!"
+end
+
+puts "Bye for now!"
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="name" data-name="What's your name?">
+# This program asks you a question.
+# Type your answer on the screen and press Enter.
+
+puts "What's your name?"
+name = gets.chomp
+
+puts "Nice to meet you, #{name}!"
+puts "Your name has #{name.length} letters."
+puts "Backwards, it is #{name.reverse}."
+puts "SHOUTED, it is #{name.upcase}!!!"
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="pyramid" data-name="Star pyramid">
+# A pyramid made of stars.
+# Try changing 6 to a bigger number!
+
+size = 6
+
+1.upto(size) do |row|
+  spaces = " " * (size - row)
+  stars = "*" * (row * 2 - 1)
+  puts spaces + stars
+end
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="rocket" data-name="Rocket countdown">
+# sleep makes Ruby wait. sleep 1 waits one second.
+
+puts "Get ready for launch!"
+
+10.downto(1) do |number|
+  puts number
+  sleep 0.5
+end
+
+puts "BLAST OFF! 🚀"
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="dice" data-name="Roll the dice">
+# rand picks a random number. Run it again for new dice!
+
+puts "Rolling two dice..."
+sleep 1
+
+first = rand(1..6)
+second = rand(1..6)
+
+puts "You rolled a #{first} and a #{second}."
+puts "That makes #{first + second}!"
+
+if first == second
+  puts "DOUBLES! Lucky you!"
+end
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="guess" data-name="Guess my number">
+# Can you find the secret number?
+
+secret = rand(1..20)
+tries = 0
+puts "I'm thinking of a number from 1 to 20."
+
+loop do
+  puts "What's your guess?"
+  guess = gets.to_i
+  tries = tries + 1
+
+  if guess < secret
+    puts "Too low! Go higher."
+  elsif guess > secret
+    puts "Too high! Go lower."
+  else
+    puts "You got it in #{tries} tries! It was #{secret}."
+    break
+  end
+end
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="pets" data-name="Talking pets">
+# A class is a recipe for making things.
+# Every Pet made from this recipe can speak.
+
+class Pet
+  def initialize(name, sound)
+    @name = name
+    @sound = sound
+  end
+
+  def speak
+    puts "#{@name} says #{@sound}!"
+  end
+end
+
+dog = Pet.new("Biscuit", "Woof")
+cat = Pet.new("Mittens", "Meow")
+cow = Pet.new("Daisy", "Moo")
+
+dog.speak
+cat.speak
+cow.speak
+
+# Make your own pet here!
+</script>
+
+<script type="text/x-ruby" class="ruby-example" data-id="code" data-name="Secret code">
+# Swap every letter for the next one: a becomes b, b becomes c...
+
+puts "Type a secret message:"
+message = gets.chomp.downcase
+
+code = message.tr("a-z", "b-za")
+puts "Secret code: #{code}"
+
+decoded = code.tr("b-za", "a-z")
+puts "Decoded:     #{decoded}"
+</script>
+
+<script type="text/x-ruby" id="prelude">
+__PRELUDE__
+</script>
+
+<script type="text/plain" id="worker-source">
+let vm = null;
+let answerWaiting = null;
+
+self.kidWrite = (stream, text) => {
+  if (text) self.postMessage({ type: "out", stream, text });
+};
+self.kidAsk = () => new Promise((resolve) => {
+  answerWaiting = resolve;
+  self.postMessage({ type: "ask" });
+});
+self.kidSleep = (ms) => new Promise((resolve) => {
+  self.postMessage({ type: "sleep", ms });
+  setTimeout(resolve, ms);
+});
+self.kidTooMuch = () => self.postMessage({ type: "too-much" });
+self.kidError = (kind, message, line, name, receiver, suggestions) => {
+  self.postMessage({ type: "error", kind, message, line, name, receiver, suggestions });
+};
+
+function loadRuntime(urls) {
+  let lastError = null;
+  for (const url of urls) {
+    try {
+      importScripts(url);
+      if (self["ruby-wasm-wasi"]) return self["ruby-wasm-wasi"];
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("The Ruby runtime script did not load.");
+}
+
+function describe(error) {
+  return String((error && error.message) || error);
+}
+
+self.onmessage = async ({ data }) => {
+  if (data.type === "boot") {
+    try {
+      const { DefaultRubyVM } = loadRuntime(data.runtimeUrls);
+      ({ vm } = await DefaultRubyVM(data.module, { consolePrint: false }));
+      vm.eval(data.prelude);
+      self.postMessage({ type: "ready" });
+    } catch (error) {
+      self.postMessage({ type: "boot-failed", message: describe(error) });
+    }
+  } else if (data.type === "run") {
+    self.kidCode = data.code;
+    try {
+      await vm.evalAsync("KidPlayground.run(JS.global[:kidCode].to_s)");
+    } catch (error) {
+      self.kidError("Error", describe(error), 0, "", "", "");
+    }
+    self.postMessage({ type: "done" });
+  } else if (data.type === "answer") {
+    const resolve = answerWaiting;
+    answerWaiting = null;
+    if (resolve) resolve(data.text);
+  }
+};
+</script>
+
+<script>
+(() => {
+  "use strict";
+
+  // Ruby 4.0 (the ruby.wasm build without the extra standard library), gzipped and cut
+  // into pieces that download side by side and stay under per-file limits on static
+  // hosts. Some hosts only serve known file types, so the pieces keep a .wasm name;
+  // loadRuby() joins and unzips them.
+  const ENGINE_PARTS = __ENGINE_PARTS__;
+  const ENGINE_BYTES = __ENGINE_BYTES__;
+  const RUNTIME_URLS = [
+    "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@2.10.1/dist/browser.umd.js",
+    new URL("engine/ruby-wasm-wasi.umd.js", location.href).href,
+  ];
+  const QUIET_LIMIT_MS = 10000;
+  const DRAFT_KEY = "ruby-playground:draft";
+
+  const WORDS = [
+    { word: "puts", label: "Show words", snippet: 'puts "[[Hello!]]"' },
+    { word: "gets", label: "Ask a question", snippet: 'puts "[[What is your favorite color?]]"\nanswer = gets.chomp\nputs "I like #{answer} too!"' },
+    { word: "times", label: "Repeat", snippet: '[[3]].times do\n  puts "Again!"\nend' },
+    { word: "if", label: "Choose", snippet: 'if [[answer == "yes"]]\n  puts "Yay!"\nelse\n  puts "Oh no!"\nend' },
+    { word: "rand", label: "Random number", snippet: 'number = rand(1..[[10]])\nputs number' },
+    { word: "sleep", label: "Wait", snippet: 'sleep [[1]]' },
+    { word: "+ - * /", label: "Math", snippet: 'puts [[6 * 7]]' },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const code = $("code");
+  const paint = $("paint");
+  const screen = $("screen");
+  const runButton = $("run");
+  const statusEl = $("status");
+  const toast = $("toast");
+
+  const prelude = $("prelude").textContent;
+  const workerUrl = URL.createObjectURL(new Blob([$("worker-source").textContent], { type: "text/javascript" }));
+  const examples = [...document.querySelectorAll("script.ruby-example")].map((node) => ({
+    id: node.dataset.id,
+    name: node.dataset.name,
+    code: node.textContent.replace(/^\n+/, "").replace(/\s+$/, "") + "\n",
+  }));
+
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  const shortcut = isMac ? "⌘ Enter" : "Ctrl Enter";
+  $("run-keys").textContent = shortcut;
+
+  let rubyModule = null;
+  let rubyProblem = null;
+  let spare = null;
+  let current = null;
+  let starting = false;
+  let watchdog = 0;
+  let outBox = null;
+  let errorLine = 0;
+  let firstRunPending = false;
+
+  // ---------- Small helpers ----------
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function setStatus(state, text) {
+    statusEl.dataset.state = state;
+    statusEl.textContent = text;
+  }
+
+  function saveDraft() {
+    try { localStorage.setItem(DRAFT_KEY, code.value); } catch (error) { /* storage is optional */ }
+  }
+
+  function loadDraft() {
+    try { return localStorage.getItem(DRAFT_KEY); } catch (error) { return null; }
+  }
+
+  // ---------- Syntax colors ----------
+
+  const KEYWORDS = new Set("def end do if elsif else unless while until for in return class module then case when break next begin rescue ensure yield and or not true false nil self".split(" "));
+  const CALLS = new Set("puts print p pp gets sleep rand loop exit require format".split(" "));
+  const TOKEN = /(#.*$)|("(?:[^"\\]|\\.)*"?)|('(?:[^'\\]|\\.)*'?)|(:[A-Za-z_]\w*[?!]?)|(\d[\d_]*(?:\.\d+)?)|(@@?\w+|\$\w+)|([A-Za-z_]\w*[?!]?)/g;
+
+  function paintCode(text) {
+    let html = "";
+    let last = 0;
+    TOKEN.lastIndex = 0;
+    for (const match of text.matchAll(TOKEN)) {
+      html += escapeHtml(text.slice(last, match.index));
+      const [token, comment, dstring, sstring, symbol, number, ivar, word] = match;
+      if (comment) html += `<span class="t-com">${escapeHtml(token)}</span>`;
+      else if (dstring) html += paintString(token);
+      else if (sstring || symbol) html += `<span class="${symbol ? "t-const" : "t-str"}">${escapeHtml(token)}</span>`;
+      else if (number) html += `<span class="t-num">${token}</span>`;
+      else if (ivar) html += `<span class="t-ivar">${escapeHtml(token)}</span>`;
+      else if (word) {
+        const afterDot = text[match.index - 1] === ".";
+        let kind = "";
+        if (afterDot) kind = "t-meth";
+        else if (KEYWORDS.has(word)) kind = "t-key";
+        else if (CALLS.has(word)) kind = "t-call";
+        else if (/^[A-Z]/.test(word)) kind = "t-const";
+        html += kind ? `<span class="${kind}">${escapeHtml(word)}</span>` : escapeHtml(word);
+      }
+      last = match.index + token.length;
+    }
+    return html + escapeHtml(text.slice(last));
+  }
+
+  function paintString(text) {
+    let html = "";
+    let last = 0;
+    for (const match of text.matchAll(/#\{([^}]*)\}?/g)) {
+      html += `<span class="t-str">${escapeHtml(text.slice(last, match.index))}</span>`;
+      const closed = match[0].endsWith("}");
+      html += `<span class="t-interp">#{</span>${paintCode(match[1])}${closed ? '<span class="t-interp">}</span>' : ""}`;
+      last = match.index + match[0].length;
+    }
+    return html + `<span class="t-str">${escapeHtml(text.slice(last))}</span>`;
+  }
+
+  function render() {
+    paint.innerHTML = code.value
+      .split("\n")
+      .map((line, index) => `<div class="ln${index + 1 === errorLine ? " bad" : ""}">${paintCode(line) || " "}</div>`)
+      .join("");
+    code.scrollTop = 0;
+    code.scrollLeft = 0;
+  }
+
+  function markLine(line) {
+    errorLine = line;
+    render();
+  }
+
+  // ---------- Editing ----------
+
+  function insertText(text) {
+    code.focus();
+    if (!document.execCommand("insertText", false, text)) {
+      code.setRangeText(text, code.selectionStart, code.selectionEnd, "end");
+      code.dispatchEvent(new Event("input"));
+    }
+  }
+
+  function setCode(text) {
+    code.value = text;
+    errorLine = 0;
+    render();
+    saveDraft();
+    markActiveExample();
+  }
+
+  function addWord(snippet) {
+    const value = code.value;
+    const caret = code.selectionEnd;
+    const lineStart = value.lastIndexOf("\n", caret - 1) + 1;
+    const nextBreak = value.indexOf("\n", caret);
+    const lineEnd = nextBreak === -1 ? value.length : nextBreak;
+    const line = value.slice(lineStart, lineEnd);
+    const indent = line.match(/^ */)[0];
+    const body = snippet.split("\n").map((part, index) => (index ? indent + part : part)).join("\n");
+    const pick = body.indexOf("[[");
+    const clean = body.replace("[[", "").replace("]]", "");
+    const pickLength = pick === -1 ? 0 : body.indexOf("]]") - pick - 2;
+
+    code.focus();
+    let start;
+    if (line.trim() === "") {
+      code.setSelectionRange(lineEnd, lineEnd);
+      start = lineEnd;
+      insertText(clean);
+    } else {
+      code.setSelectionRange(lineEnd, lineEnd);
+      start = lineEnd + 1 + indent.length;
+      insertText("\n" + indent + clean);
+    }
+    if (pick !== -1) code.setSelectionRange(start + pick, start + pick + pickLength);
+  }
+
+  code.addEventListener("input", () => {
+    if (errorLine) errorLine = 0;
+    render();
+    saveDraft();
+    markActiveExample();
+    hideToast();
+  });
+
+  code.addEventListener("scroll", () => { code.scrollTop = 0; code.scrollLeft = 0; });
+
+  code.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      run();
+      return;
+    }
+    if (event.key === "Escape") {
+      code.blur();
+      return;
+    }
+    if (event.key === "Tab" && !event.shiftKey && !event.altKey && !event.metaKey && !event.ctrlKey) {
+      event.preventDefault();
+      insertText("  ");
+      return;
+    }
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      const before = code.value.slice(0, code.selectionStart);
+      const line = before.slice(before.lastIndexOf("\n") + 1);
+      let indent = line.match(/^ */)[0];
+      const opensBlock = /^\s*(def|if|elsif|else|unless|while|until|class|module|case|when|begin|for)\b/.test(line)
+        || /\bdo(\s*\|[^|]*\|)?\s*$/.test(line);
+      if (opensBlock) indent += "  ";
+      event.preventDefault();
+      insertText("\n" + indent);
+    }
+  });
+
+  // ---------- Examples and words ----------
+
+  const exampleButtons = new Map();
+  for (const example of examples) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "example";
+    button.textContent = example.name;
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", () => openExample(example));
+    $("examples").append(button);
+    exampleButtons.set(example.id, button);
+  }
+
+  for (const item of WORDS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "word";
+    button.innerHTML = `<code>${escapeHtml(item.word)}</code><span>${escapeHtml(item.label)}</span>`;
+    button.addEventListener("click", () => addWord(item.snippet));
+    $("words").append(button);
+  }
+
+  function markActiveExample() {
+    const text = code.value.trim();
+    for (const example of examples) {
+      exampleButtons.get(example.id).setAttribute("aria-pressed", String(example.code.trim() === text));
+    }
+  }
+
+  let toastTimer = 0;
+  let savedCode = null;
+
+  function showToast(text, previous) {
+    savedCode = previous;
+    $("toast-text").textContent = text;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 12000);
+  }
+
+  function hideToast() {
+    toast.hidden = true;
+    savedCode = null;
+  }
+
+  $("toast-undo").addEventListener("click", () => {
+    if (savedCode !== null) setCode(savedCode);
+    hideToast();
+    code.focus();
+  });
+
+  function openExample(example) {
+    const previous = code.value;
+    const isOwnWork = previous.trim() !== "" && !examples.some((item) => item.code.trim() === previous.trim());
+    if (current) stopProgram(null);
+    setCode(example.code);
+    code.scrollIntoView({ block: "nearest" });
+    $("editor").scrollTop = 0;
+    if (isOwnWork) showToast(`Opened “${example.name}”.`, previous);
+    else hideToast();
+    nudgeRun();
+  }
+
+  function nudgeRun() {
+    runButton.classList.remove("nudge");
+    void runButton.offsetWidth;
+    runButton.classList.add("nudge");
+  }
+
+  // ---------- Screen ----------
+
+  function showPlaceholder(note = "") {
+    screen.innerHTML = `
+      <div class="placeholder">
+        <strong>Your program shows up here.</strong>
+        <span>Press Run, or press <kbd>${shortcut}</kbd> in the code.</span>
+        ${note ? `<span class="wait-note">${note}</span>` : ""}
+      </div>`;
+    outBox = null;
+  }
+
+  function freshScreen() {
+    screen.innerHTML = "";
+    outBox = document.createElement("pre");
+    outBox.className = "out";
+    screen.append(outBox);
+  }
+
+  let scrollQueued = false;
+  function scrollScreen() {
+    if (scrollQueued) return;
+    scrollQueued = true;
+    requestAnimationFrame(() => {
+      scrollQueued = false;
+      screen.scrollTop = screen.scrollHeight;
+    });
+  }
+
+  function writeOut(text, stream) {
+    if (!outBox) freshScreen();
+    if (stream === "err") {
+      const span = document.createElement("span");
+      span.className = "err";
+      span.textContent = text;
+      outBox.append(span);
+    } else {
+      outBox.append(document.createTextNode(text));
+    }
+    scrollScreen();
+  }
+
+  function showAsk() {
+    if (!outBox) freshScreen();
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "ask";
+    input.id = "answer";
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.placeholder = "type here, then press Enter";
+    input.setAttribute("aria-label", "Type your answer, then press Enter");
+    const fit = () => { input.style.width = `${Math.max(input.value.length + 2, 28)}ch`; };
+    fit();
+    input.addEventListener("input", fit);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.isComposing) {
+        event.preventDefault();
+        sendAnswer(input);
+      }
+    });
+    outBox.append(input);
+    input.focus({ preventScroll: true });
+    scrollScreen();
+  }
+
+  function sendAnswer(input) {
+    if (!current) return;
+    const text = input.value;
+    const echo = document.createElement("span");
+    echo.className = "typed";
+    echo.textContent = text + "\n";
+    input.replaceWith(echo);
+    current.waiting = false;
+    current.deadline = performance.now() + QUIET_LIMIT_MS;
+    current.worker.postMessage({ type: "answer", text });
+    setStatus("running", "Running…");
+  }
+
+  function addCard(kind, title, bodyHtml, line, rawText) {
+    const card = document.createElement("div");
+    card.className = kind;
+    const badge = line ? `<button type="button" class="line-badge" data-line="${line}">Line ${line}</button>` : "";
+    const raw = rawText ? `<details><summary>What Ruby said</summary><pre>${escapeHtml(rawText)}</pre></details>` : "";
+    card.innerHTML = `<div class="oops-top"><p class="oops-title">${title}</p>${badge}</div>${bodyHtml}${raw}`;
+    const badgeButton = card.querySelector(".line-badge");
+    if (badgeButton) badgeButton.addEventListener("click", () => jumpToLine(line));
+    screen.append(card);
+    scrollScreen();
+  }
+
+  function jumpToLine(line) {
+    const lines = code.value.split("\n");
+    const start = lines.slice(0, line - 1).reduce((sum, part) => sum + part.length + 1, 0);
+    code.focus();
+    code.setSelectionRange(start, start + (lines[line - 1] || "").length);
+    const row = paint.children[line - 1];
+    if (row) row.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
+
+  function addEndMark(text) {
+    const mark = document.createElement("div");
+    mark.className = "end-mark";
+    mark.textContent = text;
+    screen.append(mark);
+    scrollScreen();
+  }
+
+  // ---------- Friendly error messages ----------
+
+  const c = (text) => `<code>${escapeHtml(text)}</code>`;
+  const COMMON_WORDS = new Set([...CALLS, "reverse", "upcase", "downcase", "capitalize", "length", "size", "times",
+    "upto", "downto", "each", "chomp", "to_i", "to_s", "first", "last", "sort", "sum", "new"]);
+
+  function explain(info) {
+    const { kind, message, line, name, receiver } = info;
+    const tips = (info.suggestions || "").split(" ").filter(Boolean)
+      .sort((a, b) => Number(COMMON_WORDS.has(b)) - Number(COMMON_WORDS.has(a)));
+    const didYouMean = tips.length ? `<p>Did you mean ${c(tips[0])}?</p>` : "";
+    let title = "Something went wrong.";
+    let markedLine = line;
+    let hint = "<p>Read what Ruby said below. It is usually a good clue.</p>";
+
+    if (kind === "SyntaxError") {
+      const notes = [...message.matchAll(/^\s*\|\s*[\^~]+\s*(.+)$/gm)].map((found) => found[1]).join(" ") || message;
+      title = `Ruby got confused reading line ${line}.`;
+      if (/unterminated string|closing delimiter/.test(notes)) {
+        hint = `<p>A quote mark is missing its partner. Words need a ${c('"')} at the start and another ${c('"')} at the end.</p>`;
+      } else if (/`\)`|unexpected '\)'/.test(notes)) {
+        hint = `<p>Check the brackets. Every ${c("(")} needs a ${c(")")}.</p>`;
+      } else if (/`\]`|unexpected '\]'/.test(notes)) {
+        hint = `<p>Check the brackets. Every ${c("[")} needs a ${c("]")}.</p>`;
+      } else if (/`\}`|unexpected '\}'/.test(notes)) {
+        hint = `<p>Check the curly brackets. Every ${c("{")} needs a ${c("}")}.</p>`;
+      } else if (/unexpected 'end'/.test(notes)) {
+        hint = `<p>There is one ${c("end")} too many. Try deleting it.</p>`;
+      } else if (/end-of-input|to end with `end`|expected an `end`/.test(notes)) {
+        title = "Ruby reached the bottom, but something was still open.";
+        markedLine = 0;
+        hint = `<p>Something is missing its ${c("end")}. Every ${c("do")}, ${c("if")}, ${c("def")} and ${c("class")} needs an ${c("end")} of its own.</p>`;
+      } else {
+        hint = "<p>Look closely at that line for a missing or extra letter or symbol.</p>";
+      }
+    } else if (kind === "NoMethodError") {
+      if (receiver === "main") {
+        title = `Ruby doesn't know how to ${c(name)}.`;
+        hint = didYouMean || `<p>Check the spelling. If it's your own method, make it first with ${c("def")}.</p>`;
+      } else if (receiver === "nil") {
+        title = `You asked ${c("nil")} to ${c(name)}.`;
+        hint = `<p>${c("nil")} means “nothing”. Something you expected to have a value is empty. Check the lines above.</p>`;
+      } else {
+        const who = receiver ? receiver.charAt(0).toUpperCase() + receiver.slice(1) : "That thing";
+        title = `${escapeHtml(who)} doesn't know how to ${c(name)}.`;
+        if (didYouMean) hint = didYouMean;
+        else if (/^the number/.test(receiver)) hint = `<p>Numbers and words know different tricks. Turn a number into words with ${c(".to_s")} first.</p>`;
+        else if (/^the words/.test(receiver)) hint = `<p>Numbers and words know different tricks. Turn words into a number with ${c(".to_i")} first.</p>`;
+        else hint = "<p>Check the spelling, or try a different method.</p>";
+      }
+    } else if (kind === "NameError") {
+      title = `Ruby doesn't know the word ${c(name)}.`;
+      hint = didYouMean || `<p>If it's a box for remembering something (a variable), make it first, like ${c(`${name} = 5`)}. If you meant words, put them in quotes: ${c(`"${name}"`)}.</p>`;
+    } else if (kind === "TypeError") {
+      if (/no implicit conversion of (Integer|Float) into String/.test(message)) {
+        title = "Ruby can't glue a number onto words with +.";
+        hint = `<p>Put the number inside ${c("#{ }")} instead, like ${c('"I am #{age}"')}. Or turn it into words with ${c(".to_s")}.</p>`;
+      } else if (/String can't be coerced/.test(message)) {
+        title = "Ruby can't add words to a number.";
+        hint = `<p>Turn the words into a number first with ${c(".to_i")}.</p>`;
+      } else if (/nil/.test(message)) {
+        title = `Something is empty (${c("nil")}).`;
+        hint = "<p>A box you used doesn't have anything in it yet. Check the lines above.</p>";
+      }
+    } else if (kind === "ZeroDivisionError") {
+      title = "Nobody can divide by zero. Not even a computer!";
+      hint = `<p>Check the number after the ${c("/")}.</p>`;
+    } else if (kind === "ArgumentError") {
+      const counts = message.match(/given (\d+), expected ([\d+.]+)/);
+      if (counts) {
+        const things = (n) => `${n} ${n === "1" ? "thing" : "things"}`;
+        title = `That method wanted ${things(counts[2])} but got ${things(counts[1])}.`;
+        hint = `<p>Check how many things you put inside the ${c("( )")}.</p>`;
+      }
+    } else if (kind === "SystemStackError") {
+      title = "Your method keeps calling itself and never stops.";
+      hint = "<p>Make sure there is a way for it to finish.</p>";
+    } else if (line) {
+      title = `Something went wrong on line ${line}.`;
+    }
+
+    const raw = kind === "Error" ? message : `${kind}: ${message}`;
+    return { title, hint, raw, line: markedLine };
+  }
+
+  // ---------- Running Ruby ----------
+
+  async function loadRuby() {
+    setStatus("loading", "Waking up Ruby… 0%");
+    // The browser keeps Ruby after the first visit, so only a first visit is slow.
+    const slowNote = setTimeout(() => {
+      if (!rubyModule && !rubyProblem && !outBox && !firstRunPending) {
+        showPlaceholder("Ruby is getting ready for the first time. That can take a few minutes, and next time it starts right away. You can look at the examples while you wait.");
+      }
+    }, 4000);
+    try {
+      if (typeof WebAssembly !== "object") throw new Error("This browser can't run WebAssembly.");
+      let bytes = await downloadEngine();
+      const head = new Uint8Array(bytes, 0, 2);
+      if (head[0] === 0x1f && head[1] === 0x8b) {
+        const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+        bytes = await new Response(stream).arrayBuffer();
+      }
+      setStatus("loading", "Waking up Ruby… almost");
+      rubyModule = await WebAssembly.compile(bytes);
+      clearTimeout(slowNote);
+      spare = spawn();
+      await spare;
+      setStatus("ready", "Ruby is ready");
+      if (firstRunPending) {
+        firstRunPending = false;
+        run();
+      }
+    } catch (error) {
+      clearTimeout(slowNote);
+      rubyProblem = error;
+      showStartProblem(error);
+    }
+  }
+
+  async function downloadEngine() {
+    const received = new Array(ENGINE_PARTS.length).fill(0);
+    const showProgress = () => {
+      const total = received.reduce((sum, part) => sum + part, 0);
+      setStatus("loading", `Waking up Ruby… ${Math.min(99, Math.round((total / ENGINE_BYTES) * 100))}%`);
+    };
+    const fetchPart = async (url, index) => {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          received[index] = 0;
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`Ruby didn't download (HTTP ${response.status} for ${url}).`);
+          if (!response.body) return response.blob();
+          const reader = response.body.getReader();
+          const chunks = [];
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received[index] += value.length;
+            showProgress();
+          }
+          return new Blob(chunks);
+        } catch (error) {
+          if (attempt >= 3) throw error;
+        }
+      }
+    };
+    const parts = await Promise.all(ENGINE_PARTS.map((url, index) => fetchPart(url, index)));
+    return new Blob(parts).arrayBuffer();
+  }
+
+  function showStartProblem(error) {
+    setStatus("problem", "Ruby couldn't start");
+    freshScreen();
+    addCard("oops", "Ruby couldn't start in this browser.",
+      "<p>Try reloading the page. Ruby needs a recent Chrome, Safari, Edge or Firefox.</p>",
+      0, String((error && error.message) || error));
+  }
+
+  function spawn() {
+    const worker = new Worker(workerUrl);
+    const ready = new Promise((resolve, reject) => {
+      worker.onmessage = ({ data }) => {
+        if (data.type === "ready") resolve(worker);
+        else if (data.type === "boot-failed") {
+          worker.terminate();
+          reject(new Error(data.message));
+        }
+      };
+      worker.onerror = (event) => {
+        event.preventDefault();
+        worker.terminate();
+        reject(new Error(event.message || "Ruby's helper didn't start."));
+      };
+    });
+    worker.postMessage({ type: "boot", module: rubyModule, prelude, runtimeUrls: RUNTIME_URLS });
+    ready.catch(() => {});
+    return ready;
+  }
+
+  function setRunButton(mode) {
+    runButton.dataset.mode = mode;
+    $("run-label").textContent = mode === "stop" ? "Stop" : "Run";
+    $("run-icon").setAttribute("d", mode === "stop" ? "M3 3h10v10H3z" : "M3 1.5v13l11-6.5z");
+  }
+
+  async function run() {
+    if (current) {
+      stopProgram("You stopped the program.");
+      return;
+    }
+    if (starting) return;
+    if (rubyProblem) {
+      showStartProblem(rubyProblem);
+      return;
+    }
+    if (!rubyModule) {
+      firstRunPending = true;
+      showPlaceholder("Got it! Your code will run as soon as Ruby is ready.");
+      return;
+    }
+
+    starting = true;
+    runButton.disabled = true;
+    errorLine = 0;
+    render();
+    freshScreen();
+    setStatus("running", "Running…");
+    const program = code.value;
+
+    let worker;
+    try {
+      worker = await (spare || spawn());
+    } catch (error) {
+      spare = null;
+      starting = false;
+      runButton.disabled = false;
+      rubyProblem = error;
+      showStartProblem(error);
+      return;
+    }
+    spare = null;
+    starting = false;
+    runButton.disabled = false;
+    setRunButton("stop");
+
+    const startedAt = performance.now();
+    current = { worker, waiting: false, startedAt, deadline: startedAt + QUIET_LIMIT_MS };
+    worker.onmessage = ({ data }) => handleMessage(worker, data);
+    worker.onerror = (event) => {
+      event.preventDefault();
+      if (current && current.worker === worker) {
+        addCard("oops", "Ruby stopped by surprise.", "<p>Press Run to try again.</p>", 0, event.message || "");
+        finish(null);
+      }
+    };
+    worker.postMessage({ type: "run", code: program });
+    clearInterval(watchdog);
+    watchdog = setInterval(checkQuiet, 500);
+  }
+
+  function handleMessage(worker, data) {
+    if (!current || current.worker !== worker) return;
+    const now = performance.now();
+    current.deadline = Math.max(current.deadline, now + QUIET_LIMIT_MS);
+    if (data.type === "out") {
+      writeOut(data.text, data.stream);
+    } else if (data.type === "ask") {
+      current.waiting = true;
+      setStatus("waiting", "Your turn to type");
+      showAsk();
+    } else if (data.type === "sleep") {
+      current.deadline = now + data.ms + QUIET_LIMIT_MS;
+    } else if (data.type === "error") {
+      const { title, hint, raw, line } = explain(data);
+      if (line) markLine(line);
+      addCard("oops", title, hint, line, raw);
+    } else if (data.type === "too-much") {
+      addCard("note", "That's a lot of lines!",
+        "<p>I stopped after 2,000 lines so the screen doesn't overflow. Is there a loop that never ends?</p>", 0, "");
+    } else if (data.type === "done") {
+      const seconds = (now - current.startedAt) / 1000;
+      finish(seconds < 1 ? "The end · faster than a blink" : `The end · ${seconds < 10 ? seconds.toFixed(1) : Math.round(seconds)} seconds`);
+    }
+  }
+
+  function checkQuiet() {
+    if (!current || current.waiting) return;
+    if (performance.now() > current.deadline) {
+      stopProgram(null);
+      addCard("note", "Your program was busy for a long time.",
+        "<p>It ran for 10 seconds without showing anything, so I stopped it. Is there a loop that never ends?</p>", 0, "");
+    }
+  }
+
+  function stopProgram(note) {
+    if (!current) return;
+    if (note) addCard("note", note, `<p>Press Run to start again.</p>`, 0, "");
+    finish(null);
+  }
+
+  function finish(endText) {
+    if (!current) return;
+    clearInterval(watchdog);
+    current.worker.terminate();
+    current = null;
+    const pendingAnswer = screen.querySelector("input.ask");
+    if (pendingAnswer) pendingAnswer.disabled = true;
+    if (endText) addEndMark(endText);
+    setRunButton("run");
+    setStatus("ready", "Ruby is ready");
+    spare = spawn();
+  }
+
+  runButton.addEventListener("click", run);
+  $("clear").addEventListener("click", () => {
+    if (current) {
+      const pending = screen.querySelector("input.ask:not(:disabled)");
+      freshScreen();
+      if (pending) {
+        outBox.append(pending);
+        pending.focus({ preventScroll: true });
+      }
+      return;
+    }
+    showPlaceholder();
+  });
+
+  // ---------- Start ----------
+
+  const draft = loadDraft();
+  const starter = examples[0];
+  setCode(draft && draft.trim() ? draft : starter.code);
+  showPlaceholder();
+  if (code.value === starter.code) firstRunPending = true;
+  loadRuby();
+})();
+</script>
